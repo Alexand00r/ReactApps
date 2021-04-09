@@ -3,27 +3,9 @@ import React from 'react';
 import TodoListItem from "../todo-list-item";
 import './todo-list.css';
 
-const TodoList = ({ todos, filter, onDeleted, searchText, onToggleDone, onToggleImportant }) => {
+const TodoList = ({ todos, onDeleted, onToggleDone, onToggleImportant }) => {
 
-    let todosFiltered;
-
-    switch (filter){
-        case 'active':
-            todosFiltered = todos.filter((el) => el.done === false);
-            break;
-        case 'done':
-            todosFiltered = todos.filter((el) => el.done === true);
-            break;
-        default:
-            todosFiltered = todos;
-            break;
-    }
-
-    if (searchText){
-        todosFiltered = todosFiltered.filter((el) => el.label.includes(searchText));
-    }
-
-    const elements = todosFiltered.map((item) => {
+    const elements = todos.map((item) => {
         const {id, ...itemProps} = item;
 
         return (

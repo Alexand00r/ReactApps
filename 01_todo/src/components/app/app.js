@@ -23,10 +23,8 @@ export default class App extends Component {
     };
 
     onSearch = (searchText) => {
-        this.setState({
-            searchText: searchText
-        })
-    }
+        this.setState({searchText});
+    };
 
     onFilterClick = (filterName) => {
         this.setState({
@@ -102,9 +100,34 @@ export default class App extends Component {
         });
     };
 
-    render () {
+    applyTextFilter (todoData, searchText) {
 
-        const { todoData } = this.state;
+        if (todoData.length === 0){
+            return todoData;
+        }
+
+        return todoData.filter((el) =>
+                el.label.toLowerCase().includes(searchText.toLowerCase())
+        );
+    };
+
+    applyStateFilter (todoData, filter) {
+        switch (filter){
+            case 'active':
+                return todoData.filter((el) => el.done === false);
+            case 'done':
+                return todoData.filter((el) => el.done === true);
+            case 'all':
+            default:
+                return todoData;
+        }
+    };
+
+    render () {
+        const {todoData, searchText, filter} = this.state;
+
+        let filteredData = this.applyTextFilter(todoData, searchText);
+        filteredData = this.applyStateFilter(filteredData, filter);
 
         const doneCount = todoData.filter((el) => el.done === true).length;
         const todoCount = todoData.length - doneCount;
@@ -116,10 +139,11 @@ export default class App extends Component {
                     <SearchPanel
                         onSearch={this.onSearch}/>
                     <ItemStatusFilter
+                        filter={filter}
                         onFilterClick={this.onFilterClick}/>
                 </div>
                 <TodoList
-                    todos={todoData}
+                    todos={filteredData}
                     filter={this.state.filter}
                     searchText={this.state.searchText}
                     onDeleted={this.deleteItem}
