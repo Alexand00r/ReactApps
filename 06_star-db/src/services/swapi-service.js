@@ -9,33 +9,76 @@ export default class SwapiService {
             throw new Error(`Could not fetch ${url}. Response status: ${res.status}`);
         }
 
-        return  await res.json();
+        return await res.json();
     };
 
     async getAllPeople() {
         const res = await this.getResource(`/people/`);
-        return res.results;
+        return res.results.map(this._transformPerson);
     };
 
     async getAllPlanets() {
         const res = await this.getResource(`/planets/`);
-        return res.results;
+        return res.results.map(this._transformPlanet);
     };
 
     async getAllStarships() {
         const res = await this.getResource(`/starships/`);
-        return res.results;
+        return res.results.map(this._transformStarship);
     };
 
-    getPerson(personId) {
-        return this.getResource(`/people/${personId}/`);
+    async getPerson(personId) {
+        const person = await this.getResource(`/people/${personId}/`);
+        return this._transformPerson(person);
     };
 
-    getPlanet(planetId) {
-        return this.getResource(`/planets/${planetId}/`);
+    async getPlanet(planetId) {
+        const planet = await this.getResource(`/planets/${planetId}/`);
+        return this._transformPlanet(planet);
     };
 
-    getPlanet(starshipId) {
-        return this.getResource(`/starships/${starshipId}/`);
+    async getStarship(starshipId) {
+        const starship = await this.getResource(`/starships/${starshipId}/`);
+        return this._transformStarship(starship);
+    };
+
+    _getIdFromUrl(item){
+        const idRegExp = /\/([0-9]*)\/$/;
+        const id = item.url.match(idRegExp)[1];
+        return id;
+    }
+
+    _transformPerson(person) {
+        return {
+            id: this._getIdFromUrl(person),
+            name: person.name,
+            gender: person.gender,
+            birthYear: person.birth_year,
+            eyeColor: person.eye_color
+        };
+    };
+
+    _transformPlanet(planet) {
+        return {
+            id: this._getIdFromUrl(planet),
+            name: planet.name,
+            population: planet.population,
+            rotationPeriod: planet.rotation_period,
+            diameter: planet.diameter
+        };
+    };
+
+    _transformStarship(starship) {
+        return {
+            id: this._getIdFromUrl(starship),
+            name: starship.name,
+            model: starship.model,
+            manufacturer: starship.manufacturer,
+            costInCredits: starship.cost_in_credits,
+            length: starship.length,
+            crew: starship.crew,
+            passengers: starship.passengers,
+            cargoCapacity: starship.cargo_capacity
+        };
     };
 };
